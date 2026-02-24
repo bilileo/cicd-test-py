@@ -18,6 +18,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
     - name: Instalar PYTHON 3
       uses: actions/setup-python@v3
       with:
@@ -26,7 +27,8 @@ jobs:
     - name: Instalar Dependencias
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        # Se agregaron pytest-cov y pytest-html a la instalación
+        pip install flake8 pytest pytest-cov pytest-html
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
     - name: Lint with flake8
@@ -45,14 +47,15 @@ jobs:
         mkdir build
         cp calculadora.py build/
 
-    - name: Build Reporte
+    - name: Build Reporte COV
       run: |
         cp -r htmlcov build/
     
-    - name: Build Reporte
+    - name: Build Reporte HTML
       run: |
-        cp -r assets build/
-        cp -r report.html build/
+        # Usamos -f o verificamos si existe para evitar errores si assets no se genera
+        if [ -d "assets" ]; then cp -r assets build/; fi
+        cp report.html build/
 
     - name: Build Artefacto ZIP
       uses: actions/upload-artifact@v4
